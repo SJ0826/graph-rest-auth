@@ -4,8 +4,13 @@ import com.example.rest_graphql_token.dto.ApiResponse;
 import com.example.rest_graphql_token.dto.LoginRequest;
 import com.example.rest_graphql_token.dto.TokenResponse;
 import com.example.rest_graphql_token.security.JwtTokenProvider;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class AuthService {
 
@@ -28,13 +33,19 @@ public class AuthService {
     }
 
     // 토큰 갱신 메서드
-    public TokenResponse refreshToken(String refreshToken) {
+    public ApiResponse<TokenResponse> refreshToken(String incomingRefreshToken) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(incomingRefreshToken);
+        String refreshToken = jsonNode.get("refreshToken").asText();
+
         if (jwtTokenProvider.validateToken(refreshToken)) {
             String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
             String newAccessToken = jwtTokenProvider.generateToken(username);
-            return new TokenResponse(newAccessToken, refreshToken);
+            return new ApiResponse<>("성공", new TokenResponse(newAccessToken, refreshToken));
         } else {
-            throw new RuntimeException("Invalid Refresh Token");
+            // 원인 출력
+            System.out.println(jwtTokenProvider.validateToken(refreshToken));
+            return new ApiResponse<>("만료된 토큰입니다.", new TokenResponse(null, null));
         }
     }
 }

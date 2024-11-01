@@ -4,6 +4,7 @@ import com.example.rest_graphql_token.dto.ApiResponse;
 import com.example.rest_graphql_token.dto.LoginRequest;
 import com.example.rest_graphql_token.dto.TokenResponse;
 import com.example.rest_graphql_token.service.AuthService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +29,7 @@ public class AuthController {
 
     // 토큰 갱신 API
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshToken(@RequestBody String refreshToken) {
-        TokenResponse tokenResponse = authService.refreshToken(refreshToken);
-        return ResponseEntity.ok(tokenResponse);
+    public ApiResponse<TokenResponse> refreshToken(@RequestBody String refreshToken) throws JsonProcessingException {
+        return authService.refreshToken(refreshToken);
     }
 }
