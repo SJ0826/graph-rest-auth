@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: rest_graphql_token
+  main:
+    web-application-type: reactive
